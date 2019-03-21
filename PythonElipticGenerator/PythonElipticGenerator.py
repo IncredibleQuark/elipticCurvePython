@@ -1,4 +1,5 @@
 import math
+import random
 
 def is_prime(n):
 
@@ -19,5 +20,19 @@ def is_prime(n):
     return True
 
 
-for n in range(1, 21):
-    print(n, is_prime(n))
+
+
+def draw_prime():
+    primes = []
+
+    for n in range(1000, 2100):
+        if (is_prime(n)):
+            primes.append(n)
+
+    print (primes)
+
+    return random.choice(primes)
+
+random_prime = draw_prime()
+
+print(random_prime)
