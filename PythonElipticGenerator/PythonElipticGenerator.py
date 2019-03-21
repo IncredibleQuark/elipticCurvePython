@@ -25,7 +25,7 @@ def is_prime(n):
 def draw_prime():
     primes = []
 
-    for n in range(1000, 2100):
+    for n in range(1, 21):
         if (is_prime(n)):
             primes.append(n)
 
@@ -33,6 +33,37 @@ def draw_prime():
 
     return random.choice(primes)
 
+
+def calculate_b(a, x, y):
+    # b = y^2 - (x^3 + ax)
+    return y**2 - (x**3 + a * x)
+
+def is_b_valid(b, a, p):
+    return (4 * a**3 + 27 * b**2) % p != 0
+
 random_prime = draw_prime()
 
-print(random_prime)
+print(random_prime, "drawn prime number")
+
+def generate_curve():
+    a = random.choice(range(1, random_prime))
+    x = random.choice(range(1, random_prime))
+    y = random.choice(range(1, random_prime))
+
+    print(a, "a parameter")
+    print(x, "x parameter")
+    print(y, "y parameter")
+
+    b = calculate_b(a, x, y)
+
+    print(b, "b calulated")
+
+    if not is_b_valid(b, a, random_prime):
+        generate_curve()
+
+    return a, x, b
+
+
+result = generate_curve()
+
+print(result)
