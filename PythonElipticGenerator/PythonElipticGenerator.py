@@ -25,7 +25,7 @@ def is_prime(n):
 def draw_prime():
     primes = []
 
-    for n in range(1, 21):
+    for n in range(100, 210000):
         if (is_prime(n)):
             primes.append(n)
 
@@ -67,3 +67,17 @@ def generate_curve():
 result = generate_curve()
 
 print(result)
+
+
+def calculate_nwd(a,b):
+
+    while b != 0:
+        c = a % b
+        a = b
+        b = c
+
+    return a
+
+nwd = calculate_nwd(100, 30)
+print(nwd)
+            
