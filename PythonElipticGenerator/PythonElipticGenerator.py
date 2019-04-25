@@ -13,78 +13,69 @@ def draw_prime_number():
     return pr
 
 
-random_prime = draw_prime_number()
-print(random_prime, "selected random prime number")
-
-
 def is_delta_valid(a, b, p):
     return (4 * a**3 + 27 * b**2) % p != 0
 
 
-def calculate_f(a, b, x):
-    return int((x ** 3 + a * x + b)) % random_prime
+def calculate_f(a, b, x, p):
+    return int((x ** 3 + a * x + b)) % p
 
 
-def check_f(a, b, x):
-    f = calculate_f(a, b, x)
-    u = calculate_legendre(f, random_prime)
-    return u == 1
+def check_legendre(f, p):
+    base = (p - 1) // 2  # use // operator to divide big integers
+    mod = pow(f, base, p)
+    return mod == 1
 
-
-def calculate_legendre(a, p):
-    if a >= p or a < 0:
-        return calculate_legendre(a % p, p)
-    elif a == 0 or a == 1:
-        return a
-    elif a == 2:
-        if p % 8 == 1 or p % 8 == 7:
-            return 1
-        else:
-            return -1
-    elif a == p-1:
-        if p % 4 == 1:
-            return 1
-        else:
-            return -1
-    else:
-        if ((p-1)/2) % 2 == 0 or ((a-1)/2) % 2 == 0:
-            return calculate_legendre(p, a)
-        else:
-            return (-1)*calculate_legendre(p, a)
-
-
-def calculate_y(a, b, x):
-    f = calculate_f(a, b, x) % random_prime
-    # f = int((x ** 3 + a * x + b))
-    po = int((random_prime + 1) / 4)
-    y = pow(f, po, random_prime)
-
-    print(f, 'sq')
-    print(y, 'yyy')
-    print(f == y**2)
+def calculate_y(f, p):
+    powing = (p + 1) // 4
+    y = pow(f, powing, p)
     return y
 
+def test_equality(y, f, p, x, a, b):
+    y_squared = pow(y, 2, p)
+    f_test = (pow(x, 3) + a * x + b) % p
+    return y_squared == f_test
 
-def draw_parameters():
-    a = random.randrange(0, random_prime-1)
-    b = random.randrange(0, random_prime-1)
-    x = random.randrange(0, random_prime-1)
 
+def draw_parameters(random_prime):
+    # draw a and b point
+    a = random.randrange(2, random_prime-1)
+    b = random.randrange(2, random_prime-1)
+
+    # check if delta % p is different than 0
     if not is_delta_valid(a, b, random_prime):
         return draw_parameters()
 
-    if not check_f(a, b, x):
-        return draw_parameters()
+    # draw x parameter
+    x = random.randrange(2, random_prime-1)
+    
+    # calculate f
+    f = calculate_f(a, b, x, random_prime)
 
-    print(a, "a parameter")
-    print(b, "b parameter")
-    print(x, "x")
+    # check Legendre Symbol
+    if not check_legendre(f, random_prime):
+        return draw_parameters(random_prime)
 
-    calculate_y(a, b, x)
+    y = calculate_y(f, random_prime)
+    # check equality
+    if not test_equality(y, f, random_prime, x, a, b):
+        return draw_parameters(random_prime)
 
-    return a, b, x
+    return {'a': a, 'b': b, 'x': x, 'y': y}
 
+def main():
+    # draw random prime number with given bit length
+    random_prime = draw_prime_number()
 
-result = draw_parameters()
+    # draw eliptic curve parameters
+    parameters = draw_parameters(random_prime)
+    
+    # print the results
+    print(parameters['a'], "a")
+    print(parameters['b'], "b")
+    print(parameters['x'], "x")
+    print(parameters['y'], "y")
 
-print(result)
+# execute program
+main()
+
