@@ -1,10 +1,8 @@
 import random
 import os
-import math
 from Crypto.Util import number
 
 PRIME_NUMBER_SIZE = 256
-N_CONSTANT = 1000
 
 
 def draw_prime_number():
@@ -27,12 +25,14 @@ def check_legendre(f, p):
     mod = pow(f, base, p)
     return mod == 1
 
+
 def calculate_y(f, p):
     powing = (p + 1) // 4
     y = pow(f, powing, p)
     return y
 
-def test_equality(y, f, p, x, a, b):
+
+def test_equality(y, p, x, a, b):
     y_squared = pow(y, 2, p)
     f_test = (pow(x, 3) + a * x + b) % p
     return y_squared == f_test
@@ -61,7 +61,7 @@ def draw_parameters(random_prime):
     y = calculate_y(f, random_prime)
 
     # check equality
-    if not test_equality(y, f, random_prime, x, a, b):
+    if not test_equality(y, random_prime, x, a, b):
         return draw_parameters(random_prime)
 
     return {'a': a, 'b': b, 'x': x, 'y': y}
@@ -69,18 +69,18 @@ def draw_parameters(random_prime):
 
 def add_points(x1, y1, a, p):
     
-    m = ((3 * x1**2 + a) // (2 * y1) ) % p
+    m = ((3 * x1**2 + a) // (2 * y1)) % p
     x3 = (m**2 - 2 * x1) % p
     y3 = (m * (x1 - x3) - y1) % p
 
     return {"x3": x3, "y3": y3}
 
 
-def calculate_r(x1, y1, a, p):
+def calculate_r(x1, y1, a, p, n):
 
     result_point = {"x3": x1, "y3": y1}
     i = 0
-    while i < N_CONSTANT:
+    while i < n:
         result_point = add_points(result_point["x3"], result_point["y3"], a, p)
         if (result_point["x3"] == x1) and (result_point["y3"] == -y1):
             result_point = {"x3": x1, "y3": y1}
@@ -88,22 +88,24 @@ def calculate_r(x1, y1, a, p):
 
     return result_point
 
+
 def test_r(r, parameters, p):
-    #y2 = x3 + ax + b
+    # y2 = x3 + ax + b
     f = calculate_f(parameters["a"], parameters["b"], r["x3"], p)
     print(f, "F FOR R")
     right = (r["x3"]**3 + parameters["a"] * r["x3"] + parameters["b"]) % p
     print(right, "right")
-    left = r["y3"]**2
+    left = r["y3"]**2 % p
 
     print(left, "LEFT")
     print(left == right)
+
 
 def main():
     # draw random prime number with given bit length
     random_prime = draw_prime_number()
 
-    # draw eliptic curve parameters
+    # draw elliptic curve parameters
     parameters = draw_parameters(random_prime)
     
     # print the results
@@ -112,13 +114,14 @@ def main():
     print(parameters['b'], "b")
     print(parameters['x'], "x")
     print(parameters['y'], "y")
+    n1 = 15
+    n2 = 20
 
-    r = calculate_r(parameters['x'], parameters['y'], parameters['a'], random_prime)
-    print(r, "RRRR")
-    test_r(r, parameters, random_prime)
+    point_alice = calculate_r(parameters['x'], parameters['y'], parameters['a'], random_prime, n1)
+    point_bob = calculate_r(parameters['x'], parameters['y'], parameters['a'], random_prime, n2)
+    print(point_alice, "RRRR")
+    test_r(point_alice, parameters, random_prime)
+
 
 # execute program
 main()
-
-
-
